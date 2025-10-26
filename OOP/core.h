@@ -1,50 +1,59 @@
+#ifndef CORE_H
+#define CORE_H
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <limits>
 using namespace std;
 
-class Person (
+// === Employee class ===
+class Employee {
+private:
+    string name;
+    string contactNumber;
+    int workDaysPerWeek;
+    double hourlyWage;
+    double overtimeWage;
+    double totalHoursWorked;
+    double overtimeHours;
+    double advancePayment;
+
 public:
-  String name;
-  double salary;
+    Employee();  // constructor
 
-  Person() {
-    name = "";
-    salary = 0;
-  }
+    void inputInfo();
+    void computePay();
+    void recordAdvance();
+    void showSummary() const;
+    string getName() const;
 
-  void setData(string n, double s) {
-      name = n;
-      salary = s;
-  }
-
-  void display() {
-      cout << "Name: " << name << ", Salary: " << salary << endl;
-  }
-
+    bool saveToFile(ofstream &file) const;
+    bool loadFromFile(ifstream &file);
 };
 
-class Payroll {
+// === EmployeeManager class ===
+class EmployeeManager {
+private:
+    vector<Employee> employees;
+
 public:
-  Person employees[10];
-  int count;
-
-  Payroll() {
-    count = 0;
-  }
-
-  void addEmployee(string name, double salary) {
-      if (count < 10) {
-          employees[count].setData(name,salary);
-          count++;
-      } else {
-          cout << "Payroll full!" << endl;
-      }
-  }
-
-}
-
-  void displayAll() {
-      for (int i = 0; i < count; i++)
-          employees[i].display();
-}
-
+    void addEmployee();
+    void recordAdvance();
+    void computeEmployeePay();
+    void viewEmployees() const;
+    void loadFromFile(const string &filename);
+    void saveToFile(const string &filename) const;
 };
+
+// === Menu class ===
+class Menu {
+private:
+    EmployeeManager manager;
+
+public:
+    void showMenu() const;
+    void handleChoice();
+};
+
+#endif
