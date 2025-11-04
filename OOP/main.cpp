@@ -1,244 +1,308 @@
-#include "core.h"
 
-// ===== Employee methods =====
+#include "core.h"
+#include <cctype>
+
+// ===== Employee =====
 Employee::Employee() {
-    name = "";
+    firstName = lastName = middleName = "";
     contactNumber = "";
-    workDaysPerWeek = 0;
     hourlyWage = 0;
     overtimeWage = 0;
-    totalHoursWorked = 0;
-    overtimeHours = 0;
+    expectedHoursPerDay = 0;
     advancePayment = 0;
 }
 
 void Employee::inputInfo() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "\n=== Add Employee ===\n";
-    cout << "Employee Name: ";
-    getline(cin, name);
-    cout << "Contact Number: ";
-    getline(cin, contactNumber);
+    cout << "Enter 0 anytime to return to main menu.\n";
 
+    string input;
+    cout << "Last Name: ";
+    getline(cin, input);
+    lastName = input;
+
+    cout << "First Name: ";
+    getline(cin, input);
+    if (input == "0") return;
+    firstName = input;
+
+    cout << "Middle Name: ";
+    getline(cin, input);
+    if (input == "0") return;
+    middleName = input;
+
+    // Contact Number validation
     while (true) {
-        cout << "Number of Workdays per Week: ";
-        if (cin >> workDaysPerWeek && workDaysPerWeek > 0) break;
-        cout << "Invalid input. Must be a positive integer.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Contact Number (11 digits, starts with 09): ";
+        getline(cin, contactNumber);
+        if (contactNumber == "0") return;
+        if (contactNumber.length() == 11 && contactNumber.substr(0, 2) == "09") {
+            bool allDigits = true;
+            for (char c : contactNumber)
+                if (!isdigit(c)) { allDigits = false; break; }
+            if (allDigits) break;
+        }
+        cout << "Invalid contact. Must be 11 digits and start with 09.\n";
     }
 
+    // Hourly Wage
     while (true) {
-        cout << "Hourly Wage: ";
-        if (cin >> hourlyWage && hourlyWage >= 0) break;
-        cout << "Invalid input. Must be a non-negative number.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Hourly Wage (0 to cancel): ";
+        if (!(cin >> hourlyWage)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input.\n";
+            continue;
+        }
+        if (hourlyWage == 0) return;
+        if (hourlyWage > 0) break;
+        cout << "Invalid input.\n";
     }
 
+    // Overtime Wage
     while (true) {
-        cout << "Overtime Wage (per hour): ";
-        if (cin >> overtimeWage && overtimeWage >= 0) break;
-        cout << "Invalid input. Must be a non-negative number.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Overtime Wage per Hour (0 to cancel): ";
+        if (!(cin >> overtimeWage)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nInvalid input.\n";
+            continue;
+        }
+        if (overtimeWage == 0) return;
+        if (overtimeWage > 0) break;
+        cout << "\nInvalid input.\n";
+    }
+
+    // Expected Hours per Day
+    while (true) {
+        cout << "Expected Hours per Day (0 to cancel): ";
+        if (!(cin >> expectedHoursPerDay)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nInvalid input.\n";
+            continue;
+        }
+        if (expectedHoursPerDay == 0) return;
+        if (expectedHoursPerDay > 0) break;
+        cout << "\nInvalid input.\n";
     }
 
     advancePayment = 0;
-    totalHoursWorked = 0;
-    overtimeHours = 0;
-
-    cout << "\nEmployee added successfully!\n";
 }
 
 void Employee::recordAdvance() {
+    cout << "\n=== Record Advance Payment ===\n";
+    cout << "Enter 0 to return to main menu.\n";
     while (true) {
-        cout << "\n=== Record Advance Payment ===\n";
-        cout << "Enter amount granted: ";
-        if (cin >> advancePayment && advancePayment >= 0) break;
-        cout << "Invalid input. Must be non-negative.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "\nEnter amount: ";
+        if (!(cin >> advancePayment)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nInvalid input.\n";
+            continue;
+        }
+        if (advancePayment == 0) {
+            cout << "\nReturning to main menu.\n";
+            return;
+        }
+        if (advancePayment > 0) break;
+        cout << "\nInvalid input.\n";
     }
-    cout << "Advance payment recorded: " << advancePayment << endl;
+    cout << "\nAdvance payment recorded: " << advancePayment << endl;
 }
 
 void Employee::computePay() {
+    cout << "\n=== Compute Pay ===\n";
+    cout << "\nEnter 0 to return to main menu.\n";
+
+    double actualHours;
     while (true) {
-        cout << "\n=== Compute Weekly Pay ===\n";
-        cout << "Enter total hours worked in the entire week: ";
-        if (cin >> totalHoursWorked && totalHoursWorked >= 0) break;
-        cout << "Invalid input.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "\nEnter actual hours worked today: ";
+        if (!(cin >> actualHours)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "\nInvalid input.\n";
+            continue;
+        }
+        if (actualHours == 0) {
+            cout << "\nReturning to main menu.\n";
+            return;
+        }
+        if (actualHours > 0) break;
+        cout << "\nInvalid input.\n";
     }
 
-    while (true) {
-        cout << "Enter overtime hours worked: ";
-        if (cin >> overtimeHours && overtimeHours >= 0) break;
-        cout << "Invalid input.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
+    double overtimeHours = 0;
+    double undertimeHours = 0;
+    if (actualHours > expectedHoursPerDay)
+        overtimeHours = actualHours - expectedHoursPerDay;
+    else if (actualHours < expectedHoursPerDay)
+        undertimeHours = expectedHoursPerDay - actualHours;
 
-    double regularPay = hourlyWage * totalHoursWorked;
+    double regularPay = hourlyWage * actualHours;
     double overtimePay = overtimeWage * overtimeHours;
-    double totalPay = regularPay + overtimePay - advancePayment;
+    double undertimeDeduction = hourlyWage * undertimeHours;
+    double totalPay = regularPay + overtimePay - undertimeDeduction - advancePayment;
 
     cout << "\n--- Pay Summary ---\n";
     cout << "Regular Pay: " << regularPay << endl;
     cout << "Overtime Pay: " << overtimePay << endl;
+    cout << "Undertime Deduction: " << undertimeDeduction << endl;
     cout << "Advance Deduction: " << advancePayment << endl;
-    cout << "Total Weekly Pay: " << totalPay << endl;
+    cout << "Total Daily Pay: " << totalPay << endl;
 }
 
 void Employee::showSummary() const {
     cout << "\n=== Employee Info ===\n";
-    cout << "Name: " << name << endl;
+    cout << "Full Name: " << lastName << ", " << firstName << " " << middleName << endl;
     cout << "Contact: " << contactNumber << endl;
-    cout << "Workdays per Week: " << workDaysPerWeek << endl;
     cout << "Hourly Wage: " << hourlyWage << endl;
     cout << "Overtime Wage: " << overtimeWage << endl;
+    cout << "Expected Hours per Day: " << expectedHoursPerDay << endl;
     cout << "Advance Payment: " << advancePayment << endl;
 }
 
-string Employee::getName() const {
-    return name;
+string Employee::getFullName() const {
+    return lastName + "," + firstName + "," + middleName;
 }
+string Employee::getContactNumber() const { return contactNumber; }
 
 bool Employee::saveToFile(ofstream &file) const {
     if (!file) return false;
-    file << name << endl
+    file << lastName << endl << firstName << endl << middleName << endl
          << contactNumber << endl
-         << workDaysPerWeek << endl
-         << hourlyWage << endl
-         << overtimeWage << endl
-         << advancePayment << endl;
+         << hourlyWage << endl << overtimeWage << endl
+         << expectedHoursPerDay << endl << advancePayment << endl;
     return true;
 }
 
 bool Employee::loadFromFile(ifstream &file) {
-    if (!getline(file, name)) return false;
+    if (!getline(file, lastName)) return false;
+    if (!getline(file, firstName)) return false;
+    if (!getline(file, middleName)) return false;
     if (!getline(file, contactNumber)) return false;
-    if (!(file >> workDaysPerWeek)) return false;
     if (!(file >> hourlyWage)) return false;
     if (!(file >> overtimeWage)) return false;
+    if (!(file >> expectedHoursPerDay)) return false;
     if (!(file >> advancePayment)) return false;
     file.ignore(numeric_limits<streamsize>::max(), '\n');
     return true;
 }
 
-// ===== EmployeeManager methods =====
-void EmployeeManager::addEmployee() {
-    Employee emp;
-    emp.inputInfo();
-    employees.push_back(emp);
-}
+// ===== EmployeeManager =====
+EmployeeManager::EmployeeManager() { empCount = 0; }
 
-void EmployeeManager::recordAdvance() {
-    if (employees.empty()) {
-        cout << "No employees available.\n";
+void EmployeeManager::addEmployee() {
+    if (empCount >= MAX_EMPLOYEES) { cout << "\nMaximum employees reached.\n"; return; }
+
+    Employee temp;
+    temp.inputInfo();
+    if (temp.getFullName().empty()) {
+        cout << "\nReturning to main menu...\n";
         return;
     }
-    cout << "\nSelect employee for advance payment:\n";
-    for (size_t i = 0; i < employees.size(); i++)
-        cout << i + 1 << ". " << employees[i].getName() << endl;
+    for (int i = 0; i < empCount; i++) {   
+        if (empList[i].getFullName() == temp.getFullName() &&
+            empList[i].getContactNumber() == temp.getContactNumber()) {
+            cout << "\nError: Employee already exists.\n";
+            return;
+        }
+    }
+
+    empList[empCount++] = temp;
+    cout << "\nEmployee added successfully!\n";
+}
+
+void EmployeeManager::recordAdvancePayment() {
+    if (empCount == 0) { cout << "\nNo employees available.\n"; return; }
+    cout << "\nSelect employee (0 to return):\n";
+    for (int i = 0; i < empCount; i++) cout << i + 1 << ". " << empList[i].getFullName() << endl;
 
     int choice;
-    cin >> choice;
-    if (choice > 0 && choice <= employees.size())
-        employees[choice - 1].recordAdvance();
-    else
-        cout << "Invalid selection.\n";
+    if (!(cin >> choice) || choice == 0) {
+        cin.clear(); cin.ignore(1000, '\n');
+        cout << "\nReturning to main menu...\n";
+        return;
+    }
+    if (choice > 0 && choice <= empCount) empList[choice - 1].recordAdvance();
+    else cout << "\nInvalid selection.\n";
 }
 
 void EmployeeManager::computeEmployeePay() {
-    if (employees.empty()) {
-        cout << "No employees available.\n";
-        return;
-    }
-    cout << "\nSelect employee to compute pay:\n";
-    for (size_t i = 0; i < employees.size(); i++)
-        cout << i + 1 << ". " << employees[i].getName() << endl;
+    if (empCount == 0) { cout << "\nNo employees available.\n"; return; }
+    cout << "\nSelect employee (0 to return):\n";
+    for (int i = 0; i < empCount; i++) cout << i + 1 << ". " << empList[i].getFullName() << endl;
 
     int choice;
-    cin >> choice;
-    if (choice > 0 && choice <= employees.size())
-        employees[choice - 1].computePay();
-    else
-        cout << "Invalid selection.\n";
-}
-
-void EmployeeManager::viewEmployees() const {
-    if (employees.empty()) {
-        cout << "No employees available.\n";
+    if (!(cin >> choice) || choice == 0) {
+        cin.clear(); cin.ignore(1000, '\n');
+        cout << "\nReturning to main menu...\n";
         return;
     }
-    for (const auto &emp : employees)
-        emp.showSummary();
+    if (choice > 0 && choice <= empCount) empList[choice - 1].computePay();
+    else cout << "\nInvalid selection.\n";
+}
+void EmployeeManager::viewEmployees() const {
+    if (empCount == 0) { cout << "No employees available.\n"; return; }
+    cout << "\nEnter 0 anytime to return.\n";
+    for (int i = 0; i < empCount; i++) empList[i].showSummary();
 }
 
-void EmployeeManager::loadFromFile(const string &filename) {
-    ifstream file(filename);
+void EmployeeManager::saveData() const {
+    ofstream file("data.txt");
+    for (int i = 0; i < empCount; i++) empList[i].saveToFile(file);
+}
+
+void EmployeeManager::loadData() {
+    ifstream file("data.txt");
     if (!file.is_open()) return;
-
-    Employee emp;
-    while (emp.loadFromFile(file))
-        employees.push_back(emp);
-
-    file.close();
+    while (empCount < MAX_EMPLOYEES && empList[empCount].loadFromFile(file)) empCount++;
 }
 
-void EmployeeManager::saveToFile(const string &filename) const {
-    ofstream file(filename);
-    for (const auto &emp : employees)
-        emp.saveToFile(file);
-    file.close();
+// ===== Menu =====
+void Menu::displayProgramInfo() const {
+    cout << "============================================\n";
+    cout << "          Payroll Management System         \n";
+    cout << "============================================\n";
 }
 
-// ===== Menu methods =====
-void Menu::showMenu() const {
+void Menu::displayMainMenu() const {
     cout << "\n==============================\n";
-    cout << " Employee Payroll System\n";
-    cout << "==============================\n";
-    cout << "1. Add Employee\n";
-    cout << "2. Record Advance Payment\n";
-    cout << "3. Compute Weekly Pay\n";
-    cout << "4. View Employee Info\n";
-    cout << "5. Save & Exit\n";
+    cout << "\n1. Add Employee\n2. Record Advance Payment\n3. Compute Daily Pay\n4. View Employee Info\n5. Save & Exit\n";
 }
 
-void Menu::handleChoice() {
-    manager.loadFromFile("data.txt");
-
+void Menu::handleUserChoice() {
     int choice;
     do {
-        showMenu();
-        cout << "Enter choice: ";
-        if (cin >> choice) {
-            switch (choice) {
-                case 1: manager.addEmployee(); break;
-                case 2: manager.recordAdvance(); break;
-                case 3: manager.computeEmployeePay(); break;
-                case 4: manager.viewEmployees(); break;
-                case 5: 
-                    manager.saveToFile("data.txt");
-                    cout << "Data saved. Exiting program.\n";
-                    break;
-                default:
-                    cout << "Invalid choice.\n";
-            }
-        } else {
-            cout << "Invalid input.\n";
+        displayMainMenu();
+        cout << "\nEnter choice: ";
+        if (!(cin >> choice)) {
+            cout << "\nInvalid input.\n";
             cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        switch (choice) {
+            case 1: manager.addEmployee(); break;
+            case 2: manager.recordAdvancePayment(); break;
+            case 3: manager.computeEmployeePay(); break;
+            case 4: manager.viewEmployees(); break;
+            case 5: manager.saveData(); cout << "\nData saved. Exiting.\n"; break;
+            default: cout << "\nInvalid choice.\n";
+        }
     } while (choice != 5);
+}
+
+void Menu::run() {
+    displayProgramInfo();
+    manager.loadData();
+    handleUserChoice();
 }
 
 // ===== main =====
 int main() {
     Menu menu;
-    menu.handleChoice();
+    menu.run();
     return 0;
 }
