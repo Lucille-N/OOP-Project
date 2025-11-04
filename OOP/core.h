@@ -2,58 +2,61 @@
 #define CORE_H
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
 #include <limits>
 using namespace std;
 
-// === Employee class ===
+const int MAX_EMPLOYEES = 20;
+
 class Employee {
 private:
-    string name;
+    string firstName;
+    string lastName;
+    string middleName;
     string contactNumber;
-    int workDaysPerWeek;
     double hourlyWage;
     double overtimeWage;
-    double totalHoursWorked;
-    double overtimeHours;
+    double expectedHoursPerDay;
     double advancePayment;
 
 public:
-    Employee();  // constructor
+    Employee();
 
     void inputInfo();
-    void computePay();
     void recordAdvance();
+    void computePay();
     void showSummary() const;
-    string getName() const;
+    string getFullName() const;
+    string getContactNumber() const;
 
     bool saveToFile(ofstream &file) const;
     bool loadFromFile(ifstream &file);
 };
 
-// === EmployeeManager class ===
 class EmployeeManager {
 private:
-    vector<Employee> employees;
+    Employee empList[MAX_EMPLOYEES];
+    int empCount;
 
 public:
+    EmployeeManager();
     void addEmployee();
-    void recordAdvance();
+    void recordAdvancePayment();
     void computeEmployeePay();
     void viewEmployees() const;
-    void loadFromFile(const string &filename);
-    void saveToFile(const string &filename) const;
+    void saveData() const;
+    void loadData();
 };
 
-// === Menu class ===
 class Menu {
 private:
     EmployeeManager manager;
 
 public:
-    void showMenu() const;
-    void handleChoice();
+    void displayProgramInfo() const;
+    void displayMainMenu() const;
+    void handleUserChoice();
+    void run();
 };
 
 #endif
